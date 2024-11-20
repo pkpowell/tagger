@@ -2,21 +2,27 @@ package tagger
 
 import (
 	"strings"
+	"sync"
 )
 
 type Tagger struct {
 	tags map[string]struct{}
+	mtx  *sync.RWMutex
 }
 
 func NewTags() *Tagger {
 	return &Tagger{
 		tags: make(map[string]struct{}),
+		mtx:  &sync.RWMutex{},
 	}
 }
 
 func (t *Tagger) Add(tag string) {
 	var found bool
-	tags := Replacer.Replace(tag)
+	tags := Replacer.Replace(strings.ToLower(tag))
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+
 	for _, tag := range strings.Split(tags, " ") {
 		for t := range t.tags {
 			if len(t) > len(tag) {
