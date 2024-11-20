@@ -5,10 +5,21 @@ import (
 	"unique"
 )
 
+type stringTag struct{ string }
+type uniqueTag struct{ unique.Handle[string] }
+
 type tagType interface {
-	string | unique.Handle[string]
+	*stringTag | *uniqueTag
 
 	Val() string
+}
+
+func (s *stringTag) Val() string {
+	return s.string
+}
+
+func (s *uniqueTag) Val() string {
+	return s.Value()
 }
 
 type Tagger[T tagType] struct {
@@ -21,9 +32,11 @@ func NewTags[T tagType]() *Tagger[T] {
 	}
 }
 
-func (t *Tagger[T]) Add(tag T) {
+func (t *Tagger[T]) Add(s T) {
+	// var tag T
+	// tag := &T{strings.ToLower(s)}
 	// tag := unique.Make(strings.ToLower(s))
-	t.tags[tag] = struct{}{}
+	t.tags[s] = struct{}{}
 }
 
 func (t *Tagger[T]) Get() (tags []string) {
