@@ -2,54 +2,53 @@ package tagger
 
 import (
 	"strings"
-	"unique"
 )
 
-type stringTag struct{ string }
-type uniqueTag struct{ unique.Handle[string] }
-
-type tagType interface {
-	*stringTag | *uniqueTag
-
-	Val() string
+type Tagger struct {
+	tags map[string]struct{}
 }
 
-func (s *stringTag) Val() string {
-	return s.string
-}
-
-func (s *uniqueTag) Val() string {
-	return s.Value()
-}
-
-type Tagger[T tagType] struct {
-	tags map[T]struct{}
-}
-
-func NewTags[T tagType]() *Tagger[T] {
-	return &Tagger[T]{
-		tags: make(map[T]struct{}),
+func NewTags() *Tagger {
+	return &Tagger{
+		tags: make(map[string]struct{}),
 	}
 }
 
-func (t *Tagger[T]) Add(s T) {
-	// var tag T
-	// tag := &T{strings.ToLower(s)}
-	// tag := unique.Make(strings.ToLower(s))
-	t.tags[s] = struct{}{}
+func (t *Tagger) Add(tag string) {
+	var found bool
+	tags := Replacer.Replace(tag)
+	for _, tag := range strings.Split(tags, " ") {
+		for t := range t.tags {
+			if len(t) > len(tag) {
+				if strings.Contains(t, tag) {
+					found = true
+					break
+				}
+			} else {
+				if strings.Contains(tag, t) {
+					found = true
+					break
+				}
+			}
+		}
+
+		if !found {
+			t.tags[tag] = struct{}{}
+		}
+	}
 }
 
-func (t *Tagger[T]) Get() (tags []string) {
+func (t *Tagger) Get() (tags []string) {
 	for tag := range t.tags {
-		tags = append(tags, tag.Val())
+		tags = append(tags, tag)
 	}
 	return
 }
 
-func (t *Tagger[T]) String() string {
+func (t *Tagger) String() string {
 	var tags []string
 	for tag := range t.tags {
-		tags = append(tags, tag.Val())
+		tags = append(tags, tag)
 	}
 	return strings.Join(tags, " ")
 }
