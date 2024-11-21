@@ -1,7 +1,6 @@
 package tagger
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 )
@@ -21,22 +20,21 @@ func New() *Tagger {
 }
 
 // Add adds a tag to the tagger.
-func (t *Tagger) AddExact(newTag string) {
-	if len(newTag) < t.min {
+func (t *Tagger) AddExact(str string) {
+	if len(str) < t.min {
 		return
 	}
-	t.add(newTag)
+	t.add(str)
 }
 
-// Add adds a tag to the tagger.
-func (t *Tagger) Add(newTags string) {
-	if len(newTags) < t.min {
+// Add parses and adds a tag (or multiple sub tags) to the tagger.
+func (t *Tagger) Add(str string) {
+	if len(str) < t.min {
 		return
 	}
 
-	tags := strings.Fields(Replacer.Replace(newTags))
+	tags := strings.Fields(Replacer.Replace(str))
 	for _, newTag := range tags {
-
 		t.add(newTag)
 	}
 }
@@ -44,32 +42,32 @@ func (t *Tagger) Add(newTags string) {
 func (t *Tagger) add(newTag string) {
 	newTag = strings.ToLower(newTag)
 	newLen := len(newTag)
-	var found bool
-
-	fmt.Println("considering:", newTag)
+	var foundNew bool
 
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
 	for knownTag := range t.tags {
-		found = false
-		if len(knownTag) <= newLen {
-			if strings.Contains(newTag, knownTag) {
-				found = true
+		foundNew = false
+		// if knownTag >= newTag check if knownTag contains newTag
+		// and if so, ignore newTag
+		if len(knownTag) >= newLen {
+			if strings.Contains(knownTag, newTag) {
+				foundNew = true
 				break
 			}
 		} else {
-			if strings.Contains(knownTag, newTag) {
-				found = true
+			// else check if newTag contains knownTag
+			// if so delete knownTag and add newTag
+			if strings.Contains(newTag, knownTag) {
+				delete(t.tags, knownTag)
+				t.tags[newTag] = struct{}{}
 				break
 			}
 		}
 	}
 
-	if found {
-		fmt.Println("not adding:", newTag)
-	} else {
-		fmt.Println("adding:", newTag)
+	if !foundNew {
 		t.tags[newTag] = struct{}{}
 	}
 }

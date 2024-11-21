@@ -17,12 +17,12 @@ func BenchmarkTags(b *testing.B) {
 
 func TestADD(t *testing.T) {
 	tagger := New()
-	tagger.Add("philip.powell")
 	tagger.Add("phil")
-	tagger.Add("phil.local")
 	tagger.Add("philip")
+	tagger.Add("philip.powell")
+	tagger.Add("phil.local")
 	tagger.Add("ph")
-	tagger.AddExact("0acd511a-4baa-5094-b68e-a330009c09e9")
+	tagger.Add("0acd511a-4baa-5094-b68e-a330009c09e9")
 	tagger.Add("0acd511a-4baa")
 
 	t.Log(tagger.Get())
@@ -39,7 +39,7 @@ func BenchmarkTagsMisc(b *testing.B) {
 	// t.Add("phil", true)
 	t.Add("philip")
 	t.Add("ph")
-	t.AddExact("0acd511a-4baa-5094-b68e-a330009c09e9")
+	t.Add("0acd511a-4baa-5094-b68e-a330009c09e9")
 	t.Add("0acd511a-4baa-")
 	// t.Add("4baa-5094-b68e-", false)
 	b.Log(t.Get())
