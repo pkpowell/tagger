@@ -27,3 +27,7 @@ var chars = []string{
 }
 
 var Replacer = strings.NewReplacer(chars...)
+
+// func init() {
+// 	strings.Fields()
+// }

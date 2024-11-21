@@ -1,6 +1,7 @@
 package tagger
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 )
@@ -8,65 +9,79 @@ import (
 type Tagger struct {
 	tags map[string]struct{}
 	mtx  *sync.RWMutex
+	min  int
 }
 
 func New() *Tagger {
 	return &Tagger{
 		tags: make(map[string]struct{}),
 		mtx:  &sync.RWMutex{},
+		min:  3,
 	}
 }
 
 // Add adds a tag to the tagger.
-func (t *Tagger) Add(newTags string, exact bool) {
-	if len(newTags) < 2 {
+func (t *Tagger) AddExact(newTag string) {
+	if len(newTag) < t.min {
 		return
 	}
-	newTags = strings.ToLower(newTags)
+	t.add(newTag)
+}
 
+// Add adds a tag to the tagger.
+func (t *Tagger) Add(newTags string) {
+	if len(newTags) < t.min {
+		return
+	}
+
+	tags := strings.Fields(Replacer.Replace(newTags))
+	for _, newTag := range tags {
+		fmt.Println("considering tag:", newTag)
+		t.add(newTag)
+	}
+}
+
+func (t *Tagger) add(newTag string) {
+	newTag = strings.ToLower(newTag)
+	newLen := len(newTag)
 	var found bool
-	var tags []string
 
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	if exact {
-		tags = []string{strings.TrimSpace(newTags)}
-	} else {
-		tags = strings.Split(strings.TrimSpace(Replacer.Replace(newTags)), " ")
-	}
-
-	for _, newTag := range tags {
+	for knownTag := range t.tags {
 		found = false
-		for knownTag := range t.tags {
-			if len(knownTag) > len(newTag) {
-				if strings.Contains(knownTag, newTag) {
-					found = true
-					break
-				}
-			} else {
-				if strings.Contains(newTag, knownTag) {
-					found = true
-					break
-				}
+		if len(knownTag) <= newLen {
+			if strings.Contains(newTag, knownTag) {
+				found = true
+				break
+			}
+		} else {
+			if strings.Contains(knownTag, newTag) {
+				found = true
+				break
 			}
 		}
+	}
 
-		if !found {
-			t.tags[newTag] = struct{}{}
-		}
+	if !found {
+		fmt.Println("adding tag:", newTag)
+		t.tags[newTag] = struct{}{}
+	} else {
+		fmt.Println("not adding tag:", newTag)
 	}
 }
 
-func (t *Tagger) Get() (tags []string) {
+func (t *Tagger) Get() []string {
+	tags := make([]string, len(t.tags))
 	for tag := range t.tags {
 		tags = append(tags, tag)
 	}
-	return
+	return tags
 }
 
 func (t *Tagger) String() string {
-	var tags []string
+	tags := make([]string, len(t.tags))
 	for tag := range t.tags {
 		tags = append(tags, tag)
 	}
