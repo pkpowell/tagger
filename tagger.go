@@ -10,20 +10,32 @@ type Tagger struct {
 	mtx  *sync.RWMutex
 }
 
-func NewTags() *Tagger {
+func New() *Tagger {
 	return &Tagger{
 		tags: make(map[string]struct{}),
 		mtx:  &sync.RWMutex{},
 	}
 }
 
-func (t *Tagger) Add(tag string) {
+func (t *Tagger) Add(newTag string, exact bool) {
+	if len(newTag) < 2 {
+		return
+	}
+	newTag = strings.ToLower(strings.TrimSpace(newTag))
+
 	var found bool
-	tags := Replacer.Replace(strings.ToLower(tag))
+	var tags []string
+
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	for _, tag := range strings.Split(tags, " ") {
+	if exact {
+		tags = []string{newTag}
+	} else {
+		tags = strings.Split(Replacer.Replace(newTag), " ")
+	}
+
+	for _, tag := range tags {
 		for t := range t.tags {
 			if len(t) > len(tag) {
 				if strings.Contains(t, tag) {
