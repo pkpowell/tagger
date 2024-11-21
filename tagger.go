@@ -17,11 +17,12 @@ func New() *Tagger {
 	}
 }
 
-func (t *Tagger) Add(newTag string, exact bool) {
-	if len(newTag) < 2 {
+// Add adds a tag to the tagger.
+func (t *Tagger) Add(newTags string, exact bool) {
+	if len(newTags) < 2 {
 		return
 	}
-	newTag = strings.ToLower(strings.TrimSpace(newTag))
+	newTags = strings.ToLower(newTags)
 
 	var found bool
 	var tags []string
@@ -30,20 +31,21 @@ func (t *Tagger) Add(newTag string, exact bool) {
 	defer t.mtx.Unlock()
 
 	if exact {
-		tags = []string{newTag}
+		tags = []string{strings.TrimSpace(newTags)}
 	} else {
-		tags = strings.Split(Replacer.Replace(newTag), " ")
+		tags = strings.Split(strings.TrimSpace(Replacer.Replace(newTags)), " ")
 	}
 
-	for _, tag := range tags {
-		for t := range t.tags {
-			if len(t) > len(tag) {
-				if strings.Contains(t, tag) {
+	for _, newTag := range tags {
+		found = false
+		for knownTag := range t.tags {
+			if len(knownTag) > len(newTag) {
+				if strings.Contains(knownTag, newTag) {
 					found = true
 					break
 				}
 			} else {
-				if strings.Contains(tag, t) {
+				if strings.Contains(newTag, knownTag) {
 					found = true
 					break
 				}
@@ -51,7 +53,7 @@ func (t *Tagger) Add(newTag string, exact bool) {
 		}
 
 		if !found {
-			t.tags[tag] = struct{}{}
+			t.tags[newTag] = struct{}{}
 		}
 	}
 }
