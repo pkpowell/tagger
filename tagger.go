@@ -46,7 +46,7 @@ func (t *Tagger) add(newTag string) {
 	newLen := len(newTag)
 	var found bool
 
-	fmt.Println("considering tag:", newTag)
+	fmt.Println("considering:", newTag)
 
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
@@ -66,16 +66,16 @@ func (t *Tagger) add(newTag string) {
 		}
 	}
 
-	if !found {
-		fmt.Println("adding tag:", newTag)
-		t.tags[newTag] = struct{}{}
+	if found {
+		fmt.Println("not adding:", newTag)
 	} else {
-		fmt.Println("not adding tag:", newTag)
+		fmt.Println("adding:", newTag)
+		t.tags[newTag] = struct{}{}
 	}
 }
 
 func (t *Tagger) Get() []string {
-	tags := make([]string, len(t.tags))
+	var tags []string
 	for tag := range t.tags {
 		tags = append(tags, tag)
 	}
