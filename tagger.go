@@ -36,7 +36,7 @@ func (t *Tagger) Add(newTags string) {
 
 	tags := strings.Fields(Replacer.Replace(newTags))
 	for _, newTag := range tags {
-		fmt.Println("considering tag:", newTag)
+
 		t.add(newTag)
 	}
 }
@@ -45,6 +45,8 @@ func (t *Tagger) add(newTag string) {
 	newTag = strings.ToLower(newTag)
 	newLen := len(newTag)
 	var found bool
+
+	fmt.Println("considering tag:", newTag)
 
 	t.mtx.Lock()
 	defer t.mtx.Unlock()

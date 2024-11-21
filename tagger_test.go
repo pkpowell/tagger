@@ -40,7 +40,7 @@ func BenchmarkTagsMisc(b *testing.B) {
 	t.Add("philip")
 	t.Add("ph")
 	t.AddExact("0acd511a-4baa-5094-b68e-a330009c09e9")
-	// t.Add("0acd511a-4baa-", false)
+	t.Add("0acd511a-4baa-")
 	// t.Add("4baa-5094-b68e-", false)
 	b.Log(t.Get())
 }
