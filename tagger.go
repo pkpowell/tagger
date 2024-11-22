@@ -1,7 +1,6 @@
 package tagger
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 )
@@ -81,7 +80,6 @@ func (t *Tagger) add(newTag string) {
 }
 
 func (t *Tagger) Get() []string {
-	fmt.Printf("tags %#v", t.tags)
 	tags := make([]string, 0)
 	for tag := range t.tags {
 		tags = append(tags, tag)
@@ -91,7 +89,6 @@ func (t *Tagger) Get() []string {
 }
 
 func (t *Tagger) String() string {
-	fmt.Printf("tags %#v", t.tags)
 	tags := make([]string, 0)
 	for tag := range t.tags {
 		tags = append(tags, tag)
