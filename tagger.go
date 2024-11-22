@@ -1,6 +1,7 @@
 package tagger
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 )
@@ -24,6 +25,7 @@ func (t *Tagger) AddExact(str string) {
 	if len(str) < t.min {
 		return
 	}
+
 	t.add(str)
 }
 
@@ -40,15 +42,21 @@ func (t *Tagger) Add(str string) {
 }
 
 func (t *Tagger) add(newTag string) {
-	newTag = strings.ToLower(newTag)
-	newLen := len(newTag)
+	if newTag == "" {
+		return
+	}
+
 	var foundNew bool
+	newLen := len(newTag)
+
+	newTag = strings.ToLower(newTag)
 
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
 	for knownTag := range t.tags {
 		foundNew = false
+
 		// if knownTag >= newTag check if knownTag contains newTag
 		// and if so, ignore newTag
 		if len(knownTag) >= newLen {
@@ -57,11 +65,11 @@ func (t *Tagger) add(newTag string) {
 				break
 			}
 		} else {
+
 			// else check if newTag contains knownTag
 			// if so delete knownTag and add newTag
 			if strings.Contains(newTag, knownTag) {
 				delete(t.tags, knownTag)
-				t.tags[newTag] = struct{}{}
 				break
 			}
 		}
@@ -73,17 +81,21 @@ func (t *Tagger) add(newTag string) {
 }
 
 func (t *Tagger) Get() []string {
-	var tags []string
+	fmt.Printf("tags %#v", t.tags)
+	tags := make([]string, 0)
 	for tag := range t.tags {
 		tags = append(tags, tag)
 	}
+
 	return tags
 }
 
 func (t *Tagger) String() string {
-	tags := make([]string, len(t.tags))
+	fmt.Printf("tags %#v", t.tags)
+	tags := make([]string, 0)
 	for tag := range t.tags {
 		tags = append(tags, tag)
 	}
+
 	return strings.Join(tags, " ")
 }
