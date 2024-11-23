@@ -79,7 +79,7 @@ func BenchmarkTagsMisc(b *testing.B) {
 	t.Add("4baa-5094-b68e-")
 	b.Log(t.Get())
 }
-func BenchmarkTag(b *testing.B) {
+func BenchmarkTagMap(b *testing.B) {
 	t := New()
 	for i := range b.N {
 		t.Add(fmt.Sprintf("tag1-%d", i))

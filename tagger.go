@@ -5,34 +5,46 @@ import (
 	"sync"
 )
 
-type Tagger struct {
+type TaggerMap struct {
 	tags map[string]struct{}
 	mtx  *sync.RWMutex
 	min  int
 }
 
-func New() *Tagger {
-	return &Tagger{
+// type TaggerSlice struct {
+// 	tags []string
+// 	mtx  *sync.RWMutex
+// 	min  int
+// }
+
+func New() *TaggerMap {
+	return &TaggerMap{
 		tags: make(map[string]struct{}),
 		mtx:  &sync.RWMutex{},
 		min:  3,
 	}
 }
 
-// Add adds a tag to the tagger.
-func (t *Tagger) AddExact(str string) {
-	// if len(str) < t.min {
-	// 	return
-	// }
+// func NewSlice() *TaggerSlice {
+// 	return &TaggerSlice{
+// 		tags: make([]string, 0),
+// 		mtx:  &sync.RWMutex{},
+// 		min:  3,
+// 	}
+// }
 
+// Add adds a tag to the tagger (without any transforms).
+func (t *TaggerMap) AddExact(str string) {
 	t.add(str)
 }
 
+// // Add adds a tag to the tagger (without any transforms).
+// func (t *TaggerSlice) AddExact(str string) {
+// 	t.add(str)
+// }
+
 // Add parses and adds a tag (or multiple sub tags) to the tagger.
-func (t *Tagger) Add(str string) {
-	// if len(str) < t.min {
-	// 	return
-	// }
+func (t *TaggerMap) Add(str string) {
 	var newTag string
 
 	for _, newTag = range strings.Fields(Replacer.Replace(str)) {
@@ -40,7 +52,20 @@ func (t *Tagger) Add(str string) {
 	}
 }
 
-func (t *Tagger) add(newTag string) {
+// // Add parses and adds a tag (or multiple sub tags) to the tagger.
+// func (t *TaggerSlice) Add(str string) {
+// 	var newTag string
+
+// 	for _, newTag = range strings.Fields(Replacer.Replace(str)) {
+// 		t.add(newTag)
+// 	}
+// }
+
+// func remove(slice []string, s int) []string {
+// 	return append(slice[:s], slice[s+1:]...)
+// }
+
+func (t *TaggerMap) add(newTag string) {
 	if len(newTag) < t.min {
 		return
 	}
@@ -79,7 +104,47 @@ func (t *Tagger) add(newTag string) {
 	}
 }
 
-func (t *Tagger) Get() []string {
+// func (t *TaggerSlice) add(newTag string) {
+// 	if len(newTag) < t.min {
+// 		return
+// 	}
+
+// 	var known bool
+// 	var knownTag string
+// 	var i int
+// 	newTag = strings.ToLower(newTag)
+// 	var newLen = len(newTag)
+
+// 	t.mtx.Lock()
+// 	defer t.mtx.Unlock()
+
+// 	for i, knownTag = range t.tags {
+// 		known = false
+
+// 		if len(knownTag) >= newLen {
+// 			// if knownTag >= newTag check if knownTag contains newTag
+// 			// and if so, ignore newTag
+// 			if strings.Contains(knownTag, newTag) {
+// 				known = true
+// 				break
+// 			}
+
+// 		} else {
+// 			// else check if newTag contains knownTag
+// 			// if so delete knownTag and add newTag
+// 			if strings.Contains(newTag, knownTag) {
+// 				remove(t.tags, i)
+// 				break
+// 			}
+// 		}
+// 	}
+
+// 	if !known {
+// 		t.tags = append(t.tags, newTag)
+// 	}
+// }
+
+func (t *TaggerMap) Get() []string {
 	var tag string
 	var tags = make([]string, 0)
 
@@ -90,7 +155,11 @@ func (t *Tagger) Get() []string {
 	return tags
 }
 
-func (t *Tagger) String() string {
+// func (t *TaggerSlice) Get() []string {
+// 	return t.tags
+// }
+
+func (t *TaggerMap) String() string {
 	var tag string
 	var tags = make([]string, 0)
 
@@ -100,3 +169,7 @@ func (t *Tagger) String() string {
 
 	return strings.Join(tags, " ")
 }
+
+// func (t *TaggerSlice) String() string {
+// 	return strings.Join(t.tags, " ")
+// }
