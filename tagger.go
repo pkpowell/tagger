@@ -5,15 +5,15 @@ import (
 	"sync"
 )
 
-type TaggerMap struct {
+type Tagger struct {
 	tags map[string]struct{}
 	mtx  *sync.RWMutex
 	min  int
 }
 
 // Creates a new tagger.
-func New() *TaggerMap {
-	return &TaggerMap{
+func New() *Tagger {
+	return &Tagger{
 		tags: make(map[string]struct{}),
 		mtx:  new(sync.RWMutex),
 		min:  3,
@@ -22,13 +22,13 @@ func New() *TaggerMap {
 
 // Add adds a tag to the tagger without any transforms.
 // Best for UUIDs, ip addresses etc where you want to preserve punctuation
-func (t *TaggerMap) AddExact(str string) {
+func (t *Tagger) AddExact(str string) {
 	t.add(str)
 }
 
 // Add parses and adds a tag or its sub tags to the tagger.
 // Best for regular text
-func (t *TaggerMap) Add(str string) {
+func (t *Tagger) Add(str string) {
 	var newTag string
 
 	for _, newTag = range strings.Fields(Replacer.Replace(str)) {
@@ -36,7 +36,7 @@ func (t *TaggerMap) Add(str string) {
 	}
 }
 
-func (t *TaggerMap) add(newTag string) {
+func (t *Tagger) add(newTag string) {
 	if len(newTag) < t.min {
 		return
 	}
@@ -76,7 +76,7 @@ func (t *TaggerMap) add(newTag string) {
 }
 
 // returns a slice of all tags.
-func (t *TaggerMap) Get() []string {
+func (t *Tagger) Get() []string {
 	var tag string
 	var tags = make([]string, 0)
 
@@ -88,7 +88,7 @@ func (t *TaggerMap) Get() []string {
 }
 
 // returns a space delimited string of all tags.
-func (t *TaggerMap) String() string {
+func (t *Tagger) String() string {
 	var tag string
 	var tags = make([]string, 0)
 
