@@ -11,39 +11,23 @@ type TaggerMap struct {
 	min  int
 }
 
-// type TaggerSlice struct {
-// 	tags []string
-// 	mtx  *sync.RWMutex
-// 	min  int
-// }
-
+// Creates a new tagger.
 func New() *TaggerMap {
 	return &TaggerMap{
 		tags: make(map[string]struct{}),
-		mtx:  &sync.RWMutex{},
+		mtx:  new(sync.RWMutex),
 		min:  3,
 	}
 }
 
-// func NewSlice() *TaggerSlice {
-// 	return &TaggerSlice{
-// 		tags: make([]string, 0),
-// 		mtx:  &sync.RWMutex{},
-// 		min:  3,
-// 	}
-// }
-
-// Add adds a tag to the tagger (without any transforms).
+// Add adds a tag to the tagger without any transforms.
+// Best for UUIDs, ip addresses etc where you want to preserve punctuation
 func (t *TaggerMap) AddExact(str string) {
 	t.add(str)
 }
 
-// // Add adds a tag to the tagger (without any transforms).
-// func (t *TaggerSlice) AddExact(str string) {
-// 	t.add(str)
-// }
-
-// Add parses and adds a tag (or multiple sub tags) to the tagger.
+// Add parses and adds a tag or its sub tags to the tagger.
+// Best for regular text
 func (t *TaggerMap) Add(str string) {
 	var newTag string
 
@@ -51,19 +35,6 @@ func (t *TaggerMap) Add(str string) {
 		t.add(newTag)
 	}
 }
-
-// // Add parses and adds a tag (or multiple sub tags) to the tagger.
-// func (t *TaggerSlice) Add(str string) {
-// 	var newTag string
-
-// 	for _, newTag = range strings.Fields(Replacer.Replace(str)) {
-// 		t.add(newTag)
-// 	}
-// }
-
-// func remove(slice []string, s int) []string {
-// 	return append(slice[:s], slice[s+1:]...)
-// }
 
 func (t *TaggerMap) add(newTag string) {
 	if len(newTag) < t.min {
@@ -104,46 +75,7 @@ func (t *TaggerMap) add(newTag string) {
 	}
 }
 
-// func (t *TaggerSlice) add(newTag string) {
-// 	if len(newTag) < t.min {
-// 		return
-// 	}
-
-// 	var known bool
-// 	var knownTag string
-// 	var i int
-// 	newTag = strings.ToLower(newTag)
-// 	var newLen = len(newTag)
-
-// 	t.mtx.Lock()
-// 	defer t.mtx.Unlock()
-
-// 	for i, knownTag = range t.tags {
-// 		known = false
-
-// 		if len(knownTag) >= newLen {
-// 			// if knownTag >= newTag check if knownTag contains newTag
-// 			// and if so, ignore newTag
-// 			if strings.Contains(knownTag, newTag) {
-// 				known = true
-// 				break
-// 			}
-
-// 		} else {
-// 			// else check if newTag contains knownTag
-// 			// if so delete knownTag and add newTag
-// 			if strings.Contains(newTag, knownTag) {
-// 				remove(t.tags, i)
-// 				break
-// 			}
-// 		}
-// 	}
-
-// 	if !known {
-// 		t.tags = append(t.tags, newTag)
-// 	}
-// }
-
+// returns a slice of all tags.
 func (t *TaggerMap) Get() []string {
 	var tag string
 	var tags = make([]string, 0)
@@ -155,10 +87,7 @@ func (t *TaggerMap) Get() []string {
 	return tags
 }
 
-// func (t *TaggerSlice) Get() []string {
-// 	return t.tags
-// }
-
+// returns a space delimited string of all tags.
 func (t *TaggerMap) String() string {
 	var tag string
 	var tags = make([]string, 0)
@@ -169,7 +98,3 @@ func (t *TaggerMap) String() string {
 
 	return strings.Join(tags, " ")
 }
-
-// func (t *TaggerSlice) String() string {
-// 	return strings.Join(t.tags, " ")
-// }
