@@ -3,7 +3,14 @@ package tagger
 import (
 	"fmt"
 	"testing"
+
+	"github.com/fxamacker/cbor/v2"
 )
+
+type cbData struct {
+	ArrTags []string `cbor:"arrTags"`
+	StrTags string   `cbor:"strTags"`
+}
 
 func BenchmarkTags(b *testing.B) {
 	tagger := New()
@@ -31,10 +38,27 @@ func TestADD(t *testing.T) {
 	tagger.Add("philip.powell")
 	tagger.Add("phil.local")
 	tagger.Add("ph")
+	tagger.Add("xy")
+	tagger.Add("xyz")
+	tagger.Add("abc")
+	tagger.Add("green eggs and ham")
 	tagger.AddExact("0acd511a-4baa-5094-b68e-a330009c09e9")
 	tagger.Add("0acd511a-4baa")
 
 	t.Logf("tags %#v", tagger.Get())
+
+	arrData := &cbData{
+		ArrTags: tagger.Get(),
+	}
+	strData := &cbData{
+		StrTags: tagger.String(),
+	}
+	cbData, _ := cbor.Marshal(arrData)
+	t.Logf("arrData %d bytes", len(cbData))
+
+	cbData, _ = cbor.Marshal(strData)
+	t.Logf("strData %d bytes", len(cbData))
+
 }
 
 func BenchmarkTagsMisc(b *testing.B) {

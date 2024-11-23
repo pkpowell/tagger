@@ -33,9 +33,9 @@ func (t *Tagger) Add(str string) {
 	if len(str) < t.min {
 		return
 	}
+	var newTag string
 
-	tags := strings.Fields(Replacer.Replace(str))
-	for _, newTag := range tags {
+	for _, newTag = range strings.Fields(Replacer.Replace(str)) {
 		t.add(newTag)
 	}
 }
@@ -45,26 +45,26 @@ func (t *Tagger) add(newTag string) {
 		return
 	}
 
-	var foundNew bool
-	newLen := len(newTag)
-
+	var known bool
+	var knownTag string
 	newTag = strings.ToLower(newTag)
+	var newLen = len(newTag)
 
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	for knownTag := range t.tags {
-		foundNew = false
+	for knownTag = range t.tags {
+		known = false
 
-		// if knownTag >= newTag check if knownTag contains newTag
-		// and if so, ignore newTag
 		if len(knownTag) >= newLen {
+			// if knownTag >= newTag check if knownTag contains newTag
+			// and if so, ignore newTag
 			if strings.Contains(knownTag, newTag) {
-				foundNew = true
+				known = true
 				break
 			}
-		} else {
 
+		} else {
 			// else check if newTag contains knownTag
 			// if so delete knownTag and add newTag
 			if strings.Contains(newTag, knownTag) {
@@ -74,14 +74,16 @@ func (t *Tagger) add(newTag string) {
 		}
 	}
 
-	if !foundNew {
+	if !known {
 		t.tags[newTag] = struct{}{}
 	}
 }
 
 func (t *Tagger) Get() []string {
-	tags := make([]string, 0)
-	for tag := range t.tags {
+	var tag string
+	var tags = make([]string, 0)
+
+	for tag = range t.tags {
 		tags = append(tags, tag)
 	}
 
@@ -89,8 +91,10 @@ func (t *Tagger) Get() []string {
 }
 
 func (t *Tagger) String() string {
-	tags := make([]string, 0)
-	for tag := range t.tags {
+	var tag string
+	var tags = make([]string, 0)
+
+	for tag = range t.tags {
 		tags = append(tags, tag)
 	}
 
