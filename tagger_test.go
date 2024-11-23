@@ -42,6 +42,8 @@ func TestADD(t *testing.T) {
 	tagger.Add("xyz")
 	tagger.Add("abc")
 	tagger.Add("green eggs and ham")
+	tagger.Add("fox in socks")
+	tagger.Add("one fish, two fish, red fish, blue fish")
 	tagger.AddExact("0acd511a-4baa-5094-b68e-a330009c09e9")
 	tagger.Add("0acd511a-4baa")
 

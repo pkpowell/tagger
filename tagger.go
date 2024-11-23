@@ -21,18 +21,18 @@ func New() *Tagger {
 
 // Add adds a tag to the tagger.
 func (t *Tagger) AddExact(str string) {
-	if len(str) < t.min {
-		return
-	}
+	// if len(str) < t.min {
+	// 	return
+	// }
 
 	t.add(str)
 }
 
 // Add parses and adds a tag (or multiple sub tags) to the tagger.
 func (t *Tagger) Add(str string) {
-	if len(str) < t.min {
-		return
-	}
+	// if len(str) < t.min {
+	// 	return
+	// }
 	var newTag string
 
 	for _, newTag = range strings.Fields(Replacer.Replace(str)) {
@@ -41,7 +41,7 @@ func (t *Tagger) Add(str string) {
 }
 
 func (t *Tagger) add(newTag string) {
-	if newTag == "" {
+	if len(newTag) < t.min {
 		return
 	}
 
