@@ -11,7 +11,7 @@ type Tagger struct {
 	min  int
 }
 
-// Creates a new tagger.
+// New returns a new tagger
 func New() *Tagger {
 	return &Tagger{
 		tags: make(map[string]struct{}),
@@ -20,7 +20,7 @@ func New() *Tagger {
 	}
 }
 
-// Add adds a tag to the tagger without any transforms.
+// AddExact adds a tag to the tagger without any transforms.
 // Best for UUIDs, ip addresses etc where you want to preserve punctuation
 func (t *Tagger) AddExact(str string) {
 	t.add(str)
@@ -43,6 +43,7 @@ func (t *Tagger) add(newTag string) {
 
 	var known bool
 	var knownTag string
+
 	newTag = strings.ToLower(newTag)
 	var newLen = len(newTag)
 
@@ -70,12 +71,13 @@ func (t *Tagger) add(newTag string) {
 		}
 	}
 
+	// if newTag not known, add it
 	if !known {
 		t.tags[newTag] = struct{}{}
 	}
 }
 
-// returns a slice of all tags.
+// Get returns tags as a slice
 func (t *Tagger) Get() []string {
 	var tag string
 	var tags = make([]string, 0)
@@ -87,14 +89,7 @@ func (t *Tagger) Get() []string {
 	return tags
 }
 
-// returns a space delimited string of all tags.
+// String returns tags as a space delimited string
 func (t *Tagger) String() string {
-	var tag string
-	var tags = make([]string, 0)
-
-	for tag = range t.tags {
-		tags = append(tags, tag)
-	}
-
-	return strings.Join(tags, " ")
+	return strings.Join(t.Get(), " ")
 }
