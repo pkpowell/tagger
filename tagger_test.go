@@ -2,6 +2,7 @@ package tagger
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/fxamacker/cbor/v2"
@@ -82,6 +83,6 @@ func BenchmarkTagsMisc(b *testing.B) {
 func BenchmarkTagMap(b *testing.B) {
 	t := New()
 	for i := range b.N {
-		t.Add(fmt.Sprintf("tag1-%d", i))
+		t.Add("tag1-" + strconv.Itoa(i))
 	}
 }
