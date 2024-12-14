@@ -41,7 +41,7 @@ func (t *Tagger) add(newTag string) {
 		return
 	}
 
-	var known bool
+	var isKnown = false
 	var knownTag string
 
 	newTag = strings.ToLower(newTag)
@@ -51,13 +51,13 @@ func (t *Tagger) add(newTag string) {
 	defer t.mtx.Unlock()
 
 	for knownTag = range t.tags {
-		known = false
+		isKnown = false
 
 		if len(knownTag) >= newLen {
 			// if knownTag >= newTag check if knownTag contains newTag
 			// and if so, ignore newTag
 			if strings.Contains(knownTag, newTag) {
-				known = true
+				isKnown = true
 				break
 			}
 
@@ -72,7 +72,7 @@ func (t *Tagger) add(newTag string) {
 	}
 
 	// if newTag not known, add it
-	if !known {
+	if !isKnown {
 		t.tags[newTag] = struct{}{}
 	}
 }
