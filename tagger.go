@@ -20,15 +20,15 @@ func New() *Tagger {
 	}
 }
 
-// AddExact adds a tag to the tagger without any transforms.
-// Best for UUIDs, ip addresses etc where you want to preserve punctuation
+// AddExact adds taga to the tagger without any transforms.
+// Best for UUIDs, ip addresses etc
 func (t *Tagger) AddExact(str ...string) {
 	for _, s := range str {
 		t.add(s)
 	}
 }
 
-// Add parses and adds a tag or its sub tags to the tagger.
+// Add parses and adds tags to the tagger while removing spaces and punctuation.
 // Best for regular text
 func (t *Tagger) Add(str ...string) {
 	var newTag string
@@ -44,14 +44,14 @@ func (t *Tagger) add(newTag string) {
 		return
 	}
 
+	t.mtx.Lock()
+	defer t.mtx.Unlock()
+
 	var isKnown = false
 	var knownTag string
 
 	newTag = strings.ToLower(newTag)
 	var newLen = len(newTag)
-
-	t.mtx.Lock()
-	defer t.mtx.Unlock()
 
 	for knownTag = range t.tags {
 		isKnown = false
