@@ -22,17 +22,20 @@ func New() *Tagger {
 
 // AddExact adds a tag to the tagger without any transforms.
 // Best for UUIDs, ip addresses etc where you want to preserve punctuation
-func (t *Tagger) AddExact(str string) {
-	t.add(str)
+func (t *Tagger) AddExact(str ...string) {
+	for _, s := range str {
+		t.add(s)
+	}
 }
 
 // Add parses and adds a tag or its sub tags to the tagger.
 // Best for regular text
-func (t *Tagger) Add(str string) {
+func (t *Tagger) Add(str ...string) {
 	var newTag string
-
-	for _, newTag = range strings.Fields(Replacer.Replace(str)) {
-		t.add(newTag)
+	for _, s := range str {
+		for _, newTag = range strings.Fields(Replacer.Replace(s)) {
+			t.add(newTag)
+		}
 	}
 }
 
