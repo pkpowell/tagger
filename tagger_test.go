@@ -15,7 +15,6 @@ type cbData struct {
 
 func BenchmarkTags(b *testing.B) {
 	tagger := New()
-
 	for i := range b.N {
 		s := fmt.Sprintf("tag1-%d", i)
 		tagger.Add(s)
